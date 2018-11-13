@@ -1,0 +1,18 @@
+/*
+  Header File of FrogPrince
+*/
+
+#include <string>
+class Princess;
+
+class FrogPrince{
+public:
+  FrogPrince(const std::string& name);
+  void display() const;
+  void setSpouse(Princess* betrothed);
+  
+private:
+  std::string name;
+  Princess* spouse;
+};
+

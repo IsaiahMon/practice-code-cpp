@@ -1,0 +1,22 @@
+/*
+  Header File of Princess
+  Contains prototypes for the Princess class
+*/
+
+#include <string>
+//using namespce std;
+//Dont use 'using namespace std;' in header.
+//Use 'std::' for each type that would need it
+
+class FrogPrince; //Forward declare frog prince to avoid infinite cyclic references
+
+class Princess {
+public:
+  Princess(const std::string& name);
+  void display() const;
+  void marries(FrogPrince& betrothed);
+  
+private:
+  std::string name;
+  FrogPrince* spouse;
+};

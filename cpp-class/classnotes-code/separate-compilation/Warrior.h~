@@ -1,0 +1,12 @@
+//Created by Isaiah Mon Desir. NetID: im1175
+//HW05: Separate Compilation
+
+#include "Noble.h"
+#include <iostream>
+#include <string>
+#include <vector>
+
+namespace WarriorCraft{
+
+
+}

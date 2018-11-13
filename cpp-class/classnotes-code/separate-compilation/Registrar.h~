@@ -1,0 +1,20 @@
+#include "Student.h"
+#include "Course.h"
+class Registrar {
+  friend ostream& operator<<(ostream& os, const Registrar& rhs);
+public:
+  Registrar();
+  bool addCourse(const string& courseName);
+  bool addStudent(const string& studentName);
+  bool enrollStudentInCourse(const string& studentName,
+			     const string& courseName);
+  bool cancelCourse(const string& courseName);
+  void purge();
+
+private:
+  size_t findStudent(const string& studentName);
+  size_t findCourse(const string& courseName);
+
+  vector<Course*> courses;
+  vector<Student*> students;
+};

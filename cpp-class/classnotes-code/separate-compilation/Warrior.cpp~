@@ -1,0 +1,55 @@
+#include "Noble.h"
+#include "Warrior.h"
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+
+//WARRIOR
+class Warrior{
+  friend ostream& operator<<(ostream& os, const Warrior& rhs){
+    os << rhs.name;
+    return os;
+  }
+private:
+  const string name; //Should the name of weapon be const?
+  int strength;
+  Noble* owner = nullptr; //No owner by default
+public:
+  Warrior(const string& name, int strength) : name(name), strength(strength){
+  }
+
+  bool setOwner(Noble* newOwner){
+    if(!owner){
+      owner = newOwner;
+      return true;
+    }
+    return false; //Owner hire didnt work
+  }
+  bool runaway(){
+    owner -> fire(*this);
+  }
+  
+  bool loseOwner(){
+    if(owner){
+      owner = nullptr;
+      return true;
+    }
+    return false; //If there is no owner to begin with
+  }
+  void kill(){
+    strength = 0;
+  }
+  void setStrength(double& ratio){
+    strength= strength*ratio;
+  }
+  int getStrength() const{
+    return strength;
+  }
+  const string getName() const{
+    return name;
+  }
+  const Noble* getOwner() const {
+    return owner;
+  }
+};

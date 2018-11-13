@@ -1,0 +1,85 @@
+/*
+  Registrar implementation file rec07.cpp
+*/
+
+//Registrar qualified functions
+ostream& operator<<(ostream& os, const Registrar& rhs){
+  os << "COURSES: " <<endl;
+  if(rhs.courses.size() ==0)
+    os << "None" << endl;
+  else
+    for(Course* c: rhs.courses){
+      os << *c <<endl;
+    }
+  os << "STUDENTS:" <<endl;
+  if(rhs.students.size() == 0)
+    os<< "None" << endl;
+  else
+    for(Student* s: rhs.students){
+      os << *s << endl;
+    }
+  return os;
+}
+Registrar::Registrar(){
+
+}
+bool Registrar::addCourse(const string& courseName){
+  if(findCourse(courseName) >  -1)
+    return false;
+  Course* c = new Course(courseName);//What does making a course do
+  courses.push_back(c);
+  return true;
+
+}
+bool Registrar::addStudent(const string& studentName){
+  if(findStudent(studentName) > -1)
+    return false;
+  Student* s = new Student(studentName);
+  students.push_back(s);
+  return true;
+}
+bool Registrar::enrollStudentInCourse(const string& studentName,
+				      const string& courseName){
+  if(findStudent(studentName) == -1 || findCourse(courseName) == -1)
+    return false;
+  courses[findCourse(courseName)] -> addStudent(students[findStudent(studentName)]);
+  return true;
+}
+bool Registrar::cancelCourse(const string& courseName){
+  if(findCourse(courseName) == -1)
+    return false;
+  courses[findCourse(courseName)] -> purge();//What to do here
+  for(size_t i = findCourse(courseName); i < courses.size(); i++){
+    courses[i] = courses[i+1];
+  }
+  courses.pop_back();
+  return true;
+}
+void Registrar::purge(){ //What does the purge method do?
+  for(Course*& c: courses){
+    c -> purge();
+    c = nullptr;
+    delete c;
+  }
+  courses.clear();
+  for(Student*& s: students){
+    s = nullptr;
+    delete s;
+  }
+  students.clear();
+  
+}
+size_t Registrar::findStudent(const string& studentName){
+  for(size_t i = 0; i < students.size(); i++){
+    if(students[i] -> getName() == studentName)
+      return i;
+  }
+  return -1;
+}
+size_t Registrar::findCourse(const string& courseName){
+  for(size_t i = 0; i < courses.size(); i++){
+    if(courses[i] -> getName() == courseName)
+      return i;
+  }
+  return -1;
+}

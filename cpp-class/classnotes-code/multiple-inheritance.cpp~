@@ -1,0 +1,12 @@
+//Multiple Inheritance
+#include <iostream>
+#include <vector>
+using namespace std;
+
+//Mixin
+class Flier {
+
+};
+class Animal {
+
+};

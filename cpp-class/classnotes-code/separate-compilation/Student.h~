@@ -1,0 +1,13 @@
+#include <string>
+#include <iostream>
+
+class Student {
+  friend ostream& operator<<(ostream& os, const Student& stu);
+public:
+  Student(const string& name);
+  string getName() const;
+  void addCourse(Course* coursePtr);
+private:
+  string name;
+  vector<Course*> courses;
+};

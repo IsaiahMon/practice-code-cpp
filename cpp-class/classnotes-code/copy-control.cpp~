@@ -1,0 +1,14 @@
+#includ <iostream>
+using namespace std;
+
+class Foo{
+public:
+  Foo(int x){p = new int(x);}
+  void display const {cout << *p << endl;)
+  void setValue(int val) { *p = val;}
+
+  ~Foo(){ //Destructor
+    delete p;
+    p = nullptr;
+  }
+};

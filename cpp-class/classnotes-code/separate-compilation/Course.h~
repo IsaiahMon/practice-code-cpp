@@ -1,0 +1,14 @@
+/*
+  Registrar header file rec07.cpp
+*/
+class Course {
+  friend ostream& operator<<(ostream&, const Course& crs);
+public:
+  Course(const string& courseName);
+  string getName() const;
+  void addStudent(Student* studentPtr);
+  void purge();
+private:
+  string name;
+  vector<Student*> students;
+};

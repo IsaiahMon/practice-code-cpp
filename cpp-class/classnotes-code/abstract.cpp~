@@ -1,0 +1,7 @@
+#include <iostream>
+using namespace std;
+
+class Shape {//Abstract class
+public:
+  Shape(int x, int y) : x(x), y(y) {}
+  void move(int x, int y) { this->x = x; this->y = y;}

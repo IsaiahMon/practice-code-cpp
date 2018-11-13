@@ -1,0 +1,6 @@
+class Parent{};
+class Child: public Parent{};
+class GrandChild : public Child{};
+
+void func(Parent& base) {cout << "func(Parent)\n";}
+void func(Child& derived) {cout << "func(Child)\n";}

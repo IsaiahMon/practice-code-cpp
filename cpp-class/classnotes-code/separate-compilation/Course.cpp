@@ -1,0 +1,54 @@
+/*
+  Name: Isaiah Mon DesirNetID: im1175
+  rec07
+  Course implementation file rec07.cpp
+*/
+
+#include "Registrar.h"
+#include "Course.h"
+#include "Student.h"
+#include <string>
+#include <fstream>
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+namespace BrooklynPoly{
+  //Course Qualified functions
+  ostream& operator<<(ostream& os, const Course& crs){
+    //What prints with courses
+    os << crs.name << ": " << endl;
+    if(crs.students.size() == 0)
+      os << "None" << endl;
+    else
+      for(Student* s: crs.students){
+	os << *s << endl;} //Print each student
+    return os;
+  }
+  Course::Course(const string& courseName) : name(courseName){
+  }
+  string Course::getName() const{
+    return name;
+  }
+  void Course::addStudent(Student* studentPtr){
+    students.push_back(studentPtr);
+    studentPtr -> addCourse(this);
+  }
+  void Course::loseStudent(const string& student){
+    for(size_t i =0; i < students.size(); i++){
+      if(students[i]->getName() == student){
+	for(size_t j = i; i < students.size()-1; j++){
+	  students[j] = students[j+1];
+	}
+	students.pop_back();
+	break;
+      }
+    }
+  }
+  void Course::purge(){
+    for(Student* s: students){
+      s = nullptr;
+    }
+  }
+}
