@@ -1,0 +1,89 @@
+
+/******************************************************************************
+Rec04.cpp
+Isaiah Mon Desir
+
+*******************************************************************************/
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+
+class SpeakerSystem {
+public:
+  void vibrateSpeakerCones(unsigned signal) const {
+
+    cout << "Playing: " << signal << "Hz sound..." << endl;
+    cout << "Buzz, buzzy, buzzer, bzap!!!\n";
+  }
+};
+
+//T28-30
+class Amplifier {
+public:
+  void attachSpeakers(const SpeakerSystem& spkrs)
+  {
+    if(attachedSpeakers)
+      cout << "already have speakers attached!\n";
+    else
+      attachedSpeakers = &spkrs;
+  }
+  
+  void detachSpeakers() { // should there be an "error" message if not attached?
+    attachedSpeakers = nullptr; 
+  } 
+  
+  void playMusic( ) const {
+    if (attachedSpeakers)
+      attachedSpeakers -> vibrateSpeakerCones(440); 
+    else
+      cout << "No speakers attached\n"; 
+  }
+private:
+  const SpeakerSystem* attachedSpeakers = nullptr;
+};
+
+class Person {  
+public:       
+    Person(const string& name) : name(name) {}
+    void movesInWith(Person* newRoomate) {
+        if(roomie){
+            newRoomate -> movesInWith(nullptr);
+        }
+        roomie = newRoomate;// now I have a new roomie  
+        newRoomate -> roomie = this;    // and now they do too       
+    }       
+    const string& getName() const { return name; }
+    // Don't need to use getName() below, just there for you to use in debugging.
+    const string& getRoomiesName() const { return roomie->getName(); }  
+private:
+    Person* roomie = nullptr;       
+    string name;  
+};   
+
+
+int main()
+{
+  //T29
+    Amplifier amp1, amp2, amp3, amp4;
+    SpeakerSystem speak1, speak2, speak3, speak4;
+
+    amp1.attachSpeakers(speak1);
+    amp2.attachSpeakers(speak1);
+    
+    amp1.playMusic();
+    amp2.playMusic();
+    
+    // write code to model two people in this world       
+    Person joeBob("Joe Bob"), billyJane("Billy Jane"), marySue("Mary Sue");         
+
+    // now model these two becoming roommates       
+    joeBob.movesInWith(&billyJane); 
+    
+    
+    // did this work out?       
+    cout << joeBob.getName() << " lives with " << joeBob.getRoomiesName() << endl;
+    cout << billyJane.getName() << " lives with " << billyJane.getRoomiesName() << endl;
+
+}

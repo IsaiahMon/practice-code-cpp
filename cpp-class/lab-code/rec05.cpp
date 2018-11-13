@@ -1,0 +1,228 @@
+//Isaiah Mon Desir
+//Rec05
+
+#include <string>
+#include <vector>
+#include <iostream>
+
+using namespace std;
+
+class Section{
+  //Put a friend ostream return here
+  friend ostream& operator<<(ostream& os, const Section& rhs){
+    os << "Section: " << rhs.name << ", Time slot: " <<rhs.timeslot << ", Students: " <<endl;
+    if(rhs.records.size() == 0)
+      os << "None" << endl;
+    else{
+      for(StudentLabRecord* student: rhs.records)
+	os << *student;
+    }
+    return os;
+  }
+  
+  class StudentLabRecord{
+    friend ostream& operator<<(ostream& os, const StudentLabRecord& rhs){
+      os << "Name: " << rhs.studentName << ", Grades: ";
+      for(int grade: rhs.labGrades){
+	os << grade << " ";
+      }
+      os << endl;
+      return os;
+    }
+  private:
+    const string studentName; //Assume name shouldnt be changed
+    vector <int> labGrades;//Start each student with an abscence for consistency
+  public:
+    StudentLabRecord(const string& studentName) : studentName(studentName){
+      for(int i = 0; i < 14; i++)
+	labGrades.push_back(-1);
+    }
+    void addGrade(int grade, int week){
+      labGrades[week-1] = (grade); //Where the week is the index in the array
+    }
+    string getName() const{
+      return studentName;
+    }
+  };
+  
+  class TimeSlot{
+    //Put a friend ostream return here
+    friend ostream& operator<<(ostream& os, const TimeSlot& rhs){
+      os << "[Day: " << rhs.dayOfWeek << ", Start time: ";
+      if(rhs.hour == 0)
+	os  << "12am";
+      else if(rhs.hour < 12)
+	os << rhs.hour << "am";
+      else if(rhs.hour == 12)
+	os << rhs.hour << "pm";
+      else
+	os << rhs.hour-12 << "pm";
+      os<< "]";
+      return os;
+    }
+  private:
+    string dayOfWeek;
+    int hour;
+  public:
+    TimeSlot(const string& dayOfWeek, int hour) : dayOfWeek(dayOfWeek), hour(hour) {}
+    
+
+  };
+  
+private:
+  const string name;
+  vector<StudentLabRecord*> records;
+  TimeSlot timeslot;
+  
+public:
+  Section(const string& name, const string& dayOfWeek, int hour) : name(name), timeslot(dayOfWeek, hour){
+    //Write an overload '=' operator
+  }
+  Section(const Section& sect) : name(sect.name) ,timeslot(sect.timeslot){ //Copy Constructor
+    //Section time, and hour
+    for(StudentLabRecord* rec: sect.records){
+      StudentLabRecord* newRec = new StudentLabRecord(*rec);//Takes advantage of default copy constructors **Wrong?
+      records.push_back(newRec);
+    }
+      
+  }
+  ~Section(){ //Destructor
+    //Delete record pointers
+    //Clear the records
+    cout << "Section " << name << " is being deleted" << endl;
+    for(StudentLabRecord* student: records){
+      cout << "Deleting " << student -> getName() << endl;
+      delete student;
+    }
+    records.clear();
+  }
+  const void addStudent(const string& name){ //Should this be const method?
+    StudentLabRecord* s = new StudentLabRecord(name);
+    records.push_back(s);
+  }
+  void addGrade(const string& name, int grade, int week) const {
+    int index = findStudent(name);
+    records[index] -> addGrade(grade, week);
+  }
+  int findStudent(string name) const{
+    int index = 0;
+    for(StudentLabRecord* student: records){
+      if(student -> getName() == name)
+	return index;
+      else
+	index+=1;
+    }
+    return -1; //This failure will never(?) happen according to lab description but here in case
+  }
+  void reset(){
+    cout << "Section " << name << " is being reset" << endl;
+    for(StudentLabRecord* student: records){
+      cout << "Deleting " << student -> getName() << endl;
+      delete student;
+    }
+    records.clear();
+  }
+};
+
+class LabWorker{
+  //Put a friend ostream return here
+    //Put a friend ostream return here
+  friend ostream& operator<<(ostream& os, const LabWorker& rhs){
+    if(rhs.section)
+      os << rhs.name << "has " << *rhs.section;
+    else{
+      os <<rhs.name << " does not have a section" << endl;
+    }
+    return os;
+  }
+private:
+  const string name;
+  Section* section = nullptr;
+public:
+  //Is a default param allowed?
+  LabWorker(const string& name) : name(name), section(nullptr){}
+  
+  LabWorker(const string& name, Section*& section) : name(name), section(section){}
+  //Enter grades for students
+  void addGrade(const string& name, int grade, int week) const{
+    //Find students name in the section, add grade to his vector
+    section -> addGrade(name, grade, week);
+  }
+  bool addSection(Section& newSect){
+    if(!section){
+      section = &newSect; //Profs section is the address of the new section
+      return true;
+    }
+    return false; //Dont want it to fail silently
+  }
+};
+
+
+// Test code
+void doNothing(Section sec) { 
+  cout << sec << endl;
+}
+
+int main() {
+
+  cout << "Test 1: Defining a section\n";
+  Section secA2("A2", "Tuesday", 16);
+  cout << secA2 << endl;
+
+  cout << "\nTest 2: Adding students to a section\n";
+  secA2.addStudent("John");
+  secA2.addStudent("George");
+  secA2.addStudent("Paul");
+  secA2.addStudent("Ringo");
+  cout << secA2 << endl;
+
+  cout << "\nTest 3: Defining a lab worker.\n";
+  LabWorker moe("Moe");
+  cout << moe << endl;
+
+  cout << "\nTest 4: Adding a section to a lab worker.\n";
+  moe.addSection(secA2);
+  cout << moe << endl;
+
+  cout << "\nTest 5: Adding a second section and lab worker.\n";
+  LabWorker jane("Jane");
+  Section secB3( "B3", "Thursday", 11 );
+  secB3.addStudent("Thorin");
+  secB3.addStudent("Dwalin");
+  secB3.addStudent("Balin");
+  secB3.addStudent("Kili");
+  secB3.addStudent("Fili");
+  secB3.addStudent("Dori");
+  secB3.addStudent("Nori");
+  secB3.addStudent("Ori");
+  secB3.addStudent("Oin");
+  secB3.addStudent("Gloin");
+  secB3.addStudent("Bifur");
+  secB3.addStudent("Bofur");
+  secB3.addStudent("Bombur");
+  jane.addSection(secB3);
+  cout << jane << endl;
+
+  cout << "\nTest 6: Adding some grades for week one\n";
+  moe.addGrade("John", 17, 1);  
+  moe.addGrade("Paul", 19, 1);  
+  moe.addGrade("George", 16, 1);  
+  moe.addGrade("Ringo", 7, 1);  
+  cout << moe << endl;
+
+  cout << "\nTest 7: Adding some grades for week three (skipping week 2)\n";
+  moe.addGrade("John", 15, 3);  
+  moe.addGrade("Paul", 20, 3);  
+  moe.addGrade("Ringo", 0, 3);  
+  moe.addGrade("George", 16, 3);  
+  cout << moe << endl;
+
+  cout << "\nTest 8: We're done (almost)! \nWhat should happen to all "
+       << "those students (or rather their records?)\n";
+
+  cout << "\nTest 9: Oh, IF you have covered copy constructors in lecture, "
+       << "then make sure the following call works properly, i.e. no memory leaks\n";
+  doNothing(secA2);
+  cout << "Back from doNothing\n\n";
+
+} // main

@@ -1,0 +1,363 @@
+//Isaiah Mon Desir NetID: im1175
+//HW 04: Dynamic memory
+
+#include <vector>
+#include <string>
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+class Noble;
+
+//WARRIOR
+class Warrior{
+  
+  friend ostream& operator<<(ostream& os, const Warrior& rhs){
+    os << rhs.name;
+    return os;
+  }
+private:
+  const string name; //Should the name of weapon be const?
+  int strength;
+  Noble* owner; //No owner by default
+public:
+  Warrior(const string& name, int strength) : name(name), strength(strength), owner(nullptr){
+  }
+
+  bool setOwner(Noble* newOwner){
+    if(!owner){
+      owner = newOwner;
+      return true;
+    }
+    return false; //Owner hire didnt work
+  }
+  bool loseOwner(){
+    if(owner){
+      owner = nullptr;
+      return true;
+    }
+    return false; //If there is no owner to begin with
+  }
+  void kill(){
+    strength = 0;
+  }
+  void setStrength(double& ratio){
+    strength-=(strength*ratio);
+  }
+  int getStrength() const{
+    return strength;
+  }
+  const string getName() const{
+    return name;
+  }
+  const Noble* getOwner() const {
+    return owner;
+  }
+};
+
+//NOBLE
+class Noble{
+  friend ostream& operator<<(ostream& os, const Noble& rhs){
+    os << rhs.name;
+    return os;
+  }
+private:
+  const string name;
+  vector <Warrior*> army; //Save a vector of pointers to warrior instead. //Why doesnt this work?
+  int strength;
+  
+public:
+  Noble(string name) : name(name), strength(0){}
+
+  int findWarrior(const string& w) const {
+    for(int i = 0; i < army.size(); i++){
+      if(army[i] -> getName() == w){
+	return i;
+	break;
+      }
+    }
+    return -1;
+  }
+  Warrior*& retWarrior(int index){
+    return army[index];
+  }
+  bool alive() const {
+    return strength >-1;
+  }
+  bool hire(Warrior* v){ //ADJUST FOR HOMEWORK4
+    if(alive() && !v ->getOwner()){
+      army.push_back(v);
+      v -> setOwner(this);
+      strength+= v ->getStrength();
+      return true;
+    }
+    return false;
+  }
+  bool fire(Warrior* v){ //ADJUST FOR HW4
+    if(alive()){
+      int index = findWarrior(v -> getName());
+      //^^Having to use getName() is a consequence of modifying findWarrior for other functions.
+      //Remove pointer to warrior from army
+      if(index >= 0){
+	removeWarrior(index);
+	v -> loseOwner();
+	strength-= v ->getStrength();
+	cout << "You don't work for me anymore " << *v <<"! -- " << name << endl;
+	return true;
+      }
+    }
+    return false;
+  }
+  void removeWarrior(int index){
+    for(int i = index; i < army.size()-1; i++){
+      army[index] = army[index+1];
+    }
+    army.pop_back();
+  }
+
+  void dies(){
+    for(Warrior*& w: army){
+      w -> kill();
+    }
+    strength = -1; //Only happens if warrior dies
+  }
+
+  void battle(Noble* challenger){ //Return true if lives, false if dead //HOMEWORK 4 GO BU POINTERS
+    cout << name << " battles " << *challenger << endl;
+    if(!challenger ->alive() && !alive()){
+      cout << "Oh, NO! They're both dead! Yuck!" << endl;
+    }
+    else if(!challenger -> alive()){
+      cout << "He's dead " << name << endl;
+    }
+    else if (!alive()){
+      cout << "He's dead " << challenger << endl;
+    }
+
+    else{
+      double ratio = (challenger ->getStrength()*1.0)/strength;
+      if(ratio > 1){
+	dies();//We die
+	cout << *challenger << " defeats " << name << endl;
+      }
+      else if(ratio < 1){
+	challenger ->dies();//They die
+	alterHealth(ratio);
+	cout << name << " defeats " << *challenger << endl;
+      }
+      else{ //Both die
+	dies();
+	challenger -> dies();
+	cout << "Mutual Annihalation: " <<  name
+	     << " and " << *challenger << " die at each other's hands" << endl;
+      }
+    }
+  }
+  void alterHealth(double& ratio){
+    for(Warrior* v: army){
+      strength-= v -> getStrength();
+      v -> setStrength(ratio);
+      strength+= v ->getStrength();
+    }
+  }
+  void display() const {
+    cout << name << " has an army of " << army.size() << endl;
+    for(Warrior* w : army){
+      cout << *w << ": " <<  w -> getStrength() << endl;
+    }
+  }
+  int getStrength() const {
+    return strength;
+  }
+  string getName() const{
+    return name;
+  }
+    
+};
+
+//Get all the nobles and warriors and delete
+void clear(vector<Noble*>& nobles, vector<Warrior*>& warriors){
+  for(Noble*& noble: nobles){
+    noble = nullptr;
+    delete noble;
+  }
+  nobles.clear();
+  
+  //CLEAR WARRIORS FROM HEAP ALSO
+  for(Warrior*& warrior: warriors){
+    warrior -> loseOwner();
+    warrior = nullptr;
+    delete warrior;
+  }
+  warriors.clear();
+}
+void createWarrior(const string& name, const int strength, vector<Warrior*>& freeWarriors){
+  for(Warrior* warrior: freeWarriors){
+    if(warrior -> getName() == name){
+      cerr << "A Warrior already exists with the name " << name << endl;
+      exit(1);
+    }
+  }
+  Warrior* w = new Warrior(name, strength);
+  freeWarriors.push_back(w);
+}
+void createNoble(const string& name, vector <Noble*>& nobles){
+  for(Noble* noble: nobles){
+    if(noble -> getName() == name){
+      cerr << "A Noble already exists with the name " << name << endl;
+      exit(1);
+    }
+  }
+  Noble* n = new Noble(name);
+  nobles.push_back(n);
+}
+Noble* getNoble(const string& noble, const vector<Noble*>& nobles){ //Cant be const since i changes (?)
+  for(int i =0; i < nobles.size(); i++){
+    if(nobles[i] -> getName() == noble)//Does getName() function exist?
+      return nobles[i];
+  }
+  cerr << "Could not find the Noble " << noble << endl;
+  exit(1);
+}
+Warrior* getWarrior(const string& warrior, const vector<Warrior*>& freeWarriors){ //Cant be const since i changes (?)
+  for(int i =0; i < freeWarriors.size(); i++){
+    if(freeWarriors[i] -> getName() == warrior)//Does getName() function exist?
+      return freeWarriors[i];
+  }
+  cerr << "Could not find the Warrior " << warrior << endl;
+  exit(1);
+}
+void removeWarrior(vector <Warrior*>& freeWarriors, const Warrior* warrior){
+  for(int i = 0; i < freeWarriors.size() -1; i++){
+    if(freeWarriors[i] == warrior){
+      for(int j = i ; j < freeWarriors.size()-1; j++)
+	freeWarriors[j] = freeWarriors[j+1];
+      freeWarriors.pop_back();
+      break;
+    }
+    break;
+  }
+}
+bool hire(const string& noble, const string& warrior,
+	  vector<Noble*>& nobles, vector<Warrior*>& freeWarriors){
+  if(getNoble(noble, nobles) -> hire(getWarrior(warrior, freeWarriors))){
+    return true;
+  }
+  cerr << "Hiring failed" << endl;
+  exit(1);
+  return false;
+}
+bool fire(const string& noble, const string& warrior,
+	  vector<Noble*>& nobles, vector<Warrior*>& freeWarriors){
+  //Get address of soon-to-be-fired Warrior and add back to our list
+  if(getNoble(noble, nobles) -> fire(getWarrior(warrior, freeWarriors))){
+    return true;
+  }
+  cerr << "Firing failed" << endl;
+  exit(1);
+  return false;
+}
+void status(vector <Noble*>& nobles, vector <Warrior*>freeWarriors){
+  cout << "Status" << endl << "======" << endl << "Nobles: " << endl;
+  if(nobles.size() == 0)
+    cout << "NONE" << endl;
+  else
+    for(Noble* n: nobles){
+      n -> display();
+    }
+
+  cout << "Unemployed Warriors:" << endl;
+  int count = 0; //Keep track of any warriors who have no owners
+  if(freeWarriors.size() == 0)
+    cout << "NONE" << endl;
+  else{
+    for(Warrior* w: freeWarriors)
+      if(!w -> getOwner()){
+	count+=1;
+	cout << *w << ": " << w -> getStrength() << endl;
+      }
+    if(count == 0){ //If none of the warriors we went to had an owner print none
+      cout << "NONE" << endl;
+    }
+  }
+}
+void battle(string& noble1, string& noble2, vector <Noble*>& nobles){
+  getNoble(noble1, nobles) -> battle(getNoble(noble2, nobles));
+  
+}
+
+int main(){
+  vector<Noble*>nobles;
+  vector<Warrior*>freeWarriors;//All warriors. EDITABLE(?)
+
+  ifstream ifs("nobleWarriors.txt");
+
+  if(!ifs){
+    cerr << "Could not open 'nobleWarriors.txt'" << endl;
+    exit(1);
+  }
+  
+  //Go line but read first word and if Noble make it go to Noble
+  string command, name, name2, weapName;
+  int strength;
+
+  //SEE IF YOU CAN SHORTEN THIS
+  //Maybe 
+  while(ifs >> command){ //Read first command to determine next course of action
+    //Create Noble
+    if(command == "Noble"){
+      ifs >> name;
+      createNoble(name, nobles);  //Method to create noble on heap
+    }
+    //Create Warrior
+    else if(command == "Warrior"){
+      if(ifs >> name >> strength)
+	createWarrior(name, strength, freeWarriors);
+      else{
+	cerr << "Creating a Warrior requires a name and integer strength, respectively." <<endl;
+	exit(1);
+      }
+    }
+    //Hire a Warrior by Noble
+    else if(command == "Hire"){
+      if(ifs >> name >> name2){
+	hire(name, name2, nobles, freeWarriors);
+      }
+      else{
+	cerr << "Hiring a Warrior requires name of both the Noble and Warrior, respectively." <<endl;
+	exit(1);
+      }
+    }
+    else if(command == "Fire"){
+      if(ifs >> name >> name2){
+	fire(name, name2, nobles, freeWarriors);
+      }
+      else{
+	cerr << "Firing a Warrior requires name of both the Noble and Warrior, respectively." <<endl;
+	exit(1);
+      }
+    }
+    //Return Status of the Warriors
+    else if(command == "Status"){ 
+      status(nobles, freeWarriors);
+    }
+    //Call to Warriors to Battle
+    else if(command == "Battle"){ 
+      if(ifs >> name >> name2)
+	battle(name,name2,nobles);//Battle Function
+      else{
+	cerr << "Battling Nobles requires name of both Nobles." <<endl;
+	exit(1);
+      }
+    }
+    else if(command == "Clear"){//Clears both nobles and warriors on heap
+      clear(nobles, freeWarriors);
+    }
+    //Contingency (i.e: Error in input file, etc.)
+    else{
+      cout << "Function: " << command << " not recognized" << endl;
+    }
+  }
+  ifs.close();
+}

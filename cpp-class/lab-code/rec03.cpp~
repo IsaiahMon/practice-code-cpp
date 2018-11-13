@@ -1,0 +1,118 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <cstdlib>
+
+using namespace std;
+
+class Tile{
+  
+private:
+  const int BOMB_PROBABILITY = 10;
+  bool chosen = false;
+  
+public:
+
+  const bool& getStatus() const {
+    return chosen;
+  }
+
+  const char& getContent() const{
+    return value;
+  }
+
+};
+
+
+class Minesweeper{
+
+private:
+  vector <vector <Tile> > board; //Creates a board of chars for minesweeper
+  const int ROWS = 10;
+  const int COLS = 10;
+
+public:
+
+  Minesweeper(){
+   //Make the board
+    
+  }
+
+  //Show board
+  const void display(bool show) const {
+    if(!show){
+      //Show board without bombs
+    }
+    else{
+      //Show board with bombs
+    }
+  }
+
+  const bool& void done() const {
+    return won;
+  }
+  
+  //Test if row is valid
+  bool validRow(const int& row) const {
+    return row <=ROWS-1;
+  }
+
+  //Test if column is valid
+  bool validCol(const int& col) const {
+    return col <= COLS-1;
+  }
+
+  //Test if tile was chosen already
+  bool isVisible(const int& row, const int& col) const {
+    return board[row][col].getStatus();
+  }
+  
+  //Choose tile
+  bool play(const int& row, const& int col){
+
+  }
+};
+
+
+
+int main() {
+    Minesweeper sweeper;
+    // Continue until only invisible cells are bombs
+    while (!sweeper.done()) {
+        sweeper.display(false); // display board without bombs
+
+        int row_sel = -1, col_sel = -1;
+        while (row_sel == -1) {
+            // Get a valid move
+            int r, c;
+            cout << "row? ";
+            cin >> r;
+            if (!sweeper.validRow(r)) {
+                cout << "Row out of bounds\n";
+                continue;
+            }
+            cout << "col? ";
+            cin >> c;
+            if (!sweeper.validCol(c)) {
+                cout << "Column out of bounds\n";
+                continue;
+            }
+            if (sweeper.isVisible(r,c)) {
+                cout << "Square already visible\n";
+                continue;
+            }
+            row_sel = r;
+            col_sel = c;
+        }
+        // Set selected square to be visible. May effect other cells.
+        if (!sweeper.play(row_sel,col_sel)) {
+            cout << "Sorry, you died..\n";
+            sweeper.display(true); // Final board with bombs shown
+            exit(0);
+        }
+    }
+    // Ah! All invisible cells are bombs, so you won!
+    cout << "You won!!!!\n";
+    sweeper.display(true); // Final board with bombs shown
+}

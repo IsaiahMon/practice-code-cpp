@@ -1,0 +1,66 @@
+//Created by Isaiah Mon Desir. NetID: im1175
+//HW01: Functions, structs, vectors and file I/O
+
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+struct Warrior{
+  string name;
+  int strength;
+  bool alive = true;
+
+  Warrior(name, strength) : name(name), strength(strength) {
+  }
+
+  void changeStrength(int enemyStrength){
+    strength-=enemyStrength;
+    if(strength <=0){
+      alive = false;
+    }
+  }
+  
+};
+
+void play(){
+  cout << "There are: " << 
+}
+
+void createWarrior(const string& name, const int strength, vector <Warrior>& v){
+  Warrior w (name, strength);
+  v.push_back(w);
+}
+
+void fight(const string& name1, const string& name2, vector<Warrior>& v){
+  
+}
+
+int main{
+  fileName = "warriors.txt";
+  ifstream(ifs, fileName);
+
+  if(!ifs){
+    cerr<<"Could not open " << fileName << endl;
+  }
+  
+  string command, name, name2;
+  int strength;
+  vector <Warrior> warriors;
+  
+  while(ifs){ 
+    if(ifs >> command >> name >> strength){//Only works when creating Warrior
+      createWarrior(name, strength, warriors);
+    }
+    else if(ifs >> command >> name >> name2){
+      
+    }
+    else if(ifs >> command){
+
+    }
+  }
+
+
+}
