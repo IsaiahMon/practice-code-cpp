@@ -1,0 +1,122 @@
+#include <iostream>
+using namespace std;
+
+// class Node{
+// public:
+//   Node(int data =0, Node* next = nullptr) : data(data), next(next) {}
+
+//   //accessors
+//   int getData() const {return data;}
+//   Node* getNext() const {return next;}
+
+//   //mutators
+//   void setData(int data) { this->data = data;}
+//   void setNext(Node*next) { this->next = next;}
+// private:
+//   int data;
+//   Node* next;
+// };
+
+struct Node{
+  Node(int data =0, Node* next = nullptr) : data(data), next(next) {}
+  int data;
+  Node* next;
+};
+
+void listDisplay(Node* headPtr) {
+  while(headPtr){
+    cout << headPtr->data << ",";
+    //Bump the pointer, we can do this since headPtr is a copy.
+    headPtr = headPtr->next;
+  }
+  cout << endl;
+}
+int listLength(Node* headPtr){
+  int count = 0;
+  while(headPtr){
+    ++count;
+    headPtr = headPtr->next;
+  }
+  return count;
+}
+
+//void listAddHead
+void listAddHead(Node*& headPtr, int data){
+  // 1. create node for data
+  //Node* p = new Node(data);
+  // 2. make the new node point to the old head node
+  //p -> next = headPtr;
+  //Node* p = new Node(p, headPtr);
+  // 3. make head pointer the new node
+  //headPtr = p;
+  headPtr = new Node(data, headPtr);
+}
+
+//void listAddTail
+//bool listRemoveHead
+bool listRemoveHead(Node*& headPtr){
+  if(!headPtr) //This code would crash if the headPtr is null
+    return false;
+  //1. Save old head ptr
+  Node* oldHead = headPtr;
+  //2. Set headPtr to second node
+  headPtr = oldHead->next;
+  //3. Delete first node
+  delete oldHead;
+  return true;
+}
+//bool listRemoveTail
+//void listAdd
+//void listRemove
+void listRemoveNext(Node* prior){ //A better name for this would be listRemoveNext
+  //Pass by value since prior isn't changing. Only values afterwards
+  if(prior){
+    //Save target node
+    Node* target = prior->next;
+    //Set prior node to target's next
+    prior->next = target->next;
+    //Delete target node
+    delete target;
+  }
+}
+bool listRemove(Node* headPtr, Node* target){
+  //If the target is null or head is null just fail
+  if(!target || !headPtr)
+    return false;
+  Node* afterTarget = target->next;
+  //While head pointer exists
+  while(headPtr){
+    //If the next pointer is what we want to delete
+    if(headPtr->next == target){
+      //Set prior node to target's next
+      headPtr->next = afterTarget;
+      //Delete target node
+      delete target;
+      break;
+    }
+    headPtr = headPtr->next;
+  }
+  return true;
+}
+//void listClear
+//Node* listDuplicate
+
+int main() {
+  Node* myList = nullptr;
+  myList = new Node(17);
+  // myList -> setNext(new Node(28));
+  listAddHead(myList, 19);
+  // myList->next = new Node(28);
+  listDisplay(myList);
+
+  listAddHead(myList, 6);
+  listAddHead(myList, 5);
+  listAddHead(myList, 4);
+  listAddHead(myList, 3);
+  listAddHead(myList, 2);
+  listDisplay(myList);
+  listRemove(myList, myList->next->next);
+  listDisplay(myList);
+
+  
+}
